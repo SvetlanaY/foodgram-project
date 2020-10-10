@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %} {{recipe.name}}  {% endblock %}
+{% block main_title %}{% endblock %} 
+
+{% block static_stylesheet %}
+{% load static %}
+<link rel="stylesheet" href="{% static './pages/single.css' %}">
+         
+ {% endblock static_stylesheet %}
+
+ 
+
+{% block menu %}
+
+          {% include "menu.html" with index=True %}
+ {% endblock %}
+
+   
+ 
+ {% block content %}
+ <div class="single-card" data-id="{{recipe.id">
+
+        <img class="single-card__image" src="{{ recipe.image.url }}" alt="какой-то текст"  >
+
+
+             <div class="single-card__info">
+                <div class="single-card__header-info">
+                    <h1 class="single-card__title">{{recipe.name}}
+                   </h1>
+
+                </div>
+
+
+                         
+                <ul class="single-card__items">
+                      {% for tag in recipe.tag.all %}  
+
+                      {%  if tag.name == 'Завтрак'  %}                          
+                    
+                     <li class="single-card__item"><span class="badge badge_style_orange">{{tag.name}}</span></li>
+                     
+                     {%  elif tag.name == 'Обед' %} 
+                     
+                     
+                    <li class="single-card__item"><span class="badge badge_style_purple">{{tag.name}}</span></li> 
+                    
+                    {%  elif tag.name == 'Ужин' %} 
+                    <li class="single-card__item"><span class="badge badge_style_green">{{tag.name}}</span></li>
+                    {% endif %} 
+                     {% endfor %}  
+               
+                </ul>
+               
+                <div class="single-card__items single-card__items_column">
+                    <p class="single-card__text"><span class="icon-time"></span> {{recipe.time}} мин.</p>
+                    <p class="single-card__text"><span class="icon-user"></span> {{recipe.author}}</p>
+                </div>
+         
+
+              
+                <div class="single-card__section">
+                    <h3 class="single-card__section-title">Ингридиенты:</h3>
+
+                    <div class="single-card__items single-card__items_column">
+                        {% for ingredients in recipe.ingredient_recipe_set.all %}
+                        <p class=" single-card__section-item">{{ingredients.ingredient.name}} - {{ingredients.amount}} {{ingredients.ingredient.dimension}}</p>
+                       
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="single-card__section">
+                    <h3 class="single-card__section-title">Описание:</h3>
+                    <p class=" single-card__section-text">{{ recipe.description|linebreaksbr }}</p>
+                    
+                </div>
+            </div>
+        </div>
+        {% endblock %}
+   
+        {% block scripts_js %}
+        {% load static %}
+        
+        
+        
+        <script src="{% static './js/components/Purchases.js' %}"></script>
+        
+        <script src="{% static './js/config/config.js' %}"></script>
+        
+        <script src="{% static './js/components/MainCards.js' %}"></script>
+        <script src="{% static './js/components/SingleCard.js' %}"></script>
+        <script src="{% static './js/components/Header.js' %}"></script>
+        
+        <script src="{% static './js/api/Api.js' %}"></script>
+        <script src="{% static 'singlePageNotAuth.js' %}"></script>
+        
+        {% endblock %}
+
+        
+        
+        

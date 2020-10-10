@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %} Мои подписки  {% endblock %}
+{% block main_title %}
+<div class="main__header">
+    <h1 class="main__title">
+Мои подписки
+    </h1>
+    </div>
+{% endblock %}
+
+{% block static_stylesheet %}
+{% load static %}
+<link rel="stylesheet" href="{% static './pages/myFollow.css' %}">
+         
+ {% endblock static_stylesheet %}
+
+ 
+
+{% block menu %}
+
+          {% include "menu.html" with myfollow=True %}
+ {% endblock %}
+ <div class="container">
+{% block content %}
+
+
+    <div class="card-list">
+        {% if authors and recipes %}
+        {% for author in authors %}
+        {% include "recipe_author_items.html" with author=author %}
+        {% endfor %}
+        {% endif %}
+
+
+
+    </div>    
+
+
+    <nav class="pagination" aria-label="Search results pages">
+        <ul class="pagination__container">
+            {% if page.has_other_pages %}
+
+         {% include "paginator.html" with items=page paginator=paginator%}
+         
+         {% endif %}
+          
+        </ul>
+    </nav>
+    {% endblock %}
+ </div>
+ {% block scripts_js %}
+ {% load static %}
+ <script src="{% static './js/config/config.js' %}"></script>
+ <script src="{% static './js/components/MainCards.js' %}"></script>
+ <script src="{% static './js/components/MyFollow.js' %}"></script>
+ <script src="{% static './js/components/Subscribe.js' %}"></script>
+ <script src="{% static './js/components/Header.js' %}"></script>
+ <script src="{% static './js/api/Api.js' %}"></script>
+ <script src="{% static 'myFollow.js' %}"></script>
+
+ {% endblock %}

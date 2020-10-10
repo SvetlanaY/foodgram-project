@@ -1,0 +1,73 @@
+
+ {% csrf_token %}
+
+   
+<div class="card" data-id="{{ recipe.id }}">
+ 
+    <a href="{% url 'recipe_id' recipe.id %}" class="link"><img src="{{ recipe.image.url }}" alt="{{recipe.name}}" class="card__image"></a>
+    
+    
+    <div class="card__body"> 
+        <a class="card__title link" href="{% url 'recipe_id' recipe.id %}" >{{recipe.name}}</a>         
+        <ul class="card__items">
+            {% for tag in recipe.tag.all %}           
+                {% if tag.name == 'Обед' %}  
+                    <li class="card__item"><span class="badge badge_style_green">{{tag.name}}</span></li>          
+                {% elif tag.name == 'Завтрак' %}                     
+                    <li class="card__item"><span class="badge badge_style_orange">{{tag.name}}</span></li>
+                {% elif tag.name == 'Ужин' %} 
+                    <li class="card__item"><span class="badge badge_style_purple">{{tag.name}}</span></li>
+                {% endif %}
+               
+            {% endfor %} 
+        </ul>     
+
+        <div class="card__items card__items_column">
+            <p class="card__text"><span class="icon-time"></span>  {{recipe.time}} мин.</p>
+            <p class="card__text"><span class="icon-user"></span> <a href="{% url 'profile' recipe.author.username %}" style="color: black">{{recipe.author}}</a></p>
+        </div>
+    </div>
+    <div class="card__footer">
+       
+        {% if user.is_authenticated %}
+        {% if recipe not in shop_list %}
+        <button class="button button_style_light-blue" name="purchases" data-out>
+            <span class="icon-plus button__icon"></span>Добавить в покупки</button>
+    {% else %}
+        <button class="button button_style_light-blue-outline" name="purchases">
+            <span class="icon-check button__icon"></span>Рецепт добавлен</button>
+    {% endif %}
+      
+       
+        {% if recipe not in favorites %}
+        <button class="button button_style_none" name="favorites" data-out>
+            <span class="icon-favorite"></span></button>
+    {% else %}
+        <button class="button button_style_none" name="favorites">
+            <span class="icon-favorite icon-favorite_active"></span></button>
+    {% endif %}
+{% endif %}
+       
+    
+    </div>
+</div>
+
+<!-- 
+
+
+{% if user.is_authenticated %}
+            {% if recipe not in shop_list %}
+                <button class="button button_style_light-blue" name="purchases" data-out>
+                    <span class="icon-plus button__icon"></span>Добавить в покупки</button>
+            {% else %}
+                <button class="button button_style_light-blue-outline" name="purchases">
+                    <span class="icon-check button__icon"></span>Рецепт добавлен</button>
+            {% endif %}
+            {% if recipe not in favorites_list %}
+                <button class="button button_style_none" name="favorites" data-out>
+                    <span class="icon-favorite"></span></button>
+            {% else %}
+                <button class="button button_style_none" name="favorites">
+                    <span class="icon-favorite icon-favorite_active"></span></button>
+            {% endif %}
+        {% endif %} -->
