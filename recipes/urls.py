@@ -3,6 +3,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path("recipe/edit/<int:recipe_id>", views.recipe_edit, name="recipe_edit"),
     path("subscriptions/<int:id>", views.profile_unfollow, name="profile_unfollow"),
     
     path("recipe/<int:recipe_id>/", views.recipe_view_id, name="recipe_id"),
@@ -13,9 +14,9 @@ urlpatterns = [
     path("favorites/", views.favorites_add, name="favorites_add"),
     path("myfavorites/", views.favorite_index, name="favorites"),
     path("myfollow/", views.follow_index, name="follow_index"),
-    path("shop-list", views.shop_list, name="shop_list"),
-   # path("shop-list/download", download_shop_list, name="download_shop_list"),
-    path("recipe/edit/<int:recipe_id>", views.recipe_edit, name="recipe_edit"),
+    path("shop-list/", views.shop_list, name="shop_list"),
+    path("shop-list/download/", views.download_shop_list, name="download_shop_list"),
+    
     path("recipe/delete/<int:recipe_id>", views.recipe_delete, name="recipe_delete"),
     path("purchases/", views.purchases_add, name='purchases_add'),
     path("purchases/<int:recipe_id>/", views.purchases_delete,name='purchases_delete'),

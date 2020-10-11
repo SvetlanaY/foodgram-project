@@ -8,7 +8,7 @@ from django.forms.widgets import CheckboxSelectMultiple
 class RecipeForm(ModelForm):
     class Meta:
         model = Recipe
-        fields = ["author", "name", "image", "tag", "time"]
+        fields = ["author", "name", "image", "tag", "time","description" ]
 
        
 
@@ -30,10 +30,10 @@ class RecipeForm(ModelForm):
 class RecipeCreateForm(forms.ModelForm):
     class Meta:
         model=Recipe
-        fields=("author", "name", "image", "tag", "time","description",)
+        fields=("id","author", "name", "image", "tag", "time","description",)
         widgets={'tag': CheckboxSelectMultiple(),}
-    def clean_title(self):
-        name=self.cleaned_data['name']
-        if name.lower() in ('create'):
-            raise ValidationError(f'Недопустимое имя "{name}"')
-        return name
+    # def clean_title(self):
+    #     name=self.cleaned_data['name']
+    #     if name.lower() in ('create'):
+    #         raise ValidationError(f'Недопустимое имя "{name}"')
+    #     return name

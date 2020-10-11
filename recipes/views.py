@@ -1,10 +1,11 @@
-import json
+import json,csv
 
 import codecs
+from django.db.models import F, Sum
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.core.paginator import Paginator
-from django.db.models.aggregates import Count
+from django.db.models.aggregates import Count,Sum
 from django.http import HttpResponse, HttpResponseRedirect, request
 from django.shortcuts import get_object_or_404, redirect, render
 
@@ -35,6 +36,7 @@ def index(request):
         tags_for_page_filter=tags_for_page[:-1]      
     else:
         recipes_list = (Recipe.objects.all().order_by("-pub_date")) 
+        
     paginator = Paginator(recipes_list, 3) 
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)   
@@ -222,12 +224,12 @@ def recipe_view_id (request, recipe_id):
 #     return redirect("index")
 
 
-# def page_not_found(request, exception):
-#     return render(request, "misc/404.html", {"path": request.path}, status=404)
+def page_not_found(request, exception):
+    return render(request, "404.html", {"path": request.path}, status=404)
 
 
-# def server_error(request):
-#     return render(request, "misc/500.html", status=500)
+def server_error(request):
+    return render(request, "500.html", status=500)
 
 
 # @login_required
@@ -400,7 +402,7 @@ def recipe_edit(request, recipe_id):
         return redirect('recipe_id', recipe_id=recipe_id)
 
     if request.method == 'POST':
-        form = RecipeForm(request.POST, files=request.FILES or None, instance=recipe)
+        form = RecipeCreateForm(request.POST, files=request.FILES or None, instance=recipe)
         ingredients = get_ingredients(request)
 
         if bool(ingredients) is False:
@@ -417,7 +419,7 @@ def recipe_edit(request, recipe_id):
             Ingredient_Recipe.objects.bulk_create(objs)
             return redirect('recipe_id', recipe_id=recipe_id)
     else:
-        form = RecipeForm(instance=recipe)
+        form = RecipeCreateForm(instance=recipe)
 
     return render(
         request, 'formRecipe.html',
@@ -451,3 +453,29 @@ def purchases_delete(request, recipe_id):
     shop_list = get_object_or_404(ShopList, user=request.user)
     shop_list.recipes.remove(recipe)
     return JsonResponse({'success': True})  
+
+
+def download_shop_list(request):
+    shop_list = get_object_or_404(ShopList, user=request.user)
+    recipes = shop_list.recipes.all()
+
+    ingredient_list = recipes.annotate(name1=F('ingredient_recipe__ingredient__name'),
+        dimension=F('ingredient_recipe__ingredient__dimension')
+    ).values(
+        'name1', 'dimension'
+    ).annotate(
+        total=Sum('ingredient_recipe__amount')
+    ).order_by('name1')
+
+    response = HttpResponse(content_type='text/txt')
+    response['Content-Disposition'] = 'attachment; filename="shop-list.txt"'
+
+    writer = csv.writer(response)
+
+    for ingredient in ingredient_list:
+        name1 = ingredient['name1']
+        dimension = ingredient['dimension']
+        total = ingredient['total']
+        writer.writerow([f'{name1} ({dimension}) - {total}'])
+
+    return response
