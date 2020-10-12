@@ -55,9 +55,9 @@
 
                 <div class="form__field-group">
                     <div class="tags">    
-                      
-
-
+                        {% for tag_choice, tag_value in form.tag.field.choices %}                    
+{{tag_choice}}
+{% endfor %}
                         {% for tag_model in form.fields.tag.choices.queryset %}
                         <div class="tags__item">
                             <input

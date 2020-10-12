@@ -16,7 +16,7 @@ def get_ingredients(request):
     ingredients = {}
     for key in request.POST:
         if key.startswith('nameIngredient'):
-            value_ingredient = key[15:].encode('unicode-escape').decode('unicode-escape')
+            value_ingredient = key[15:]
 
             ingredients[request.POST[key]] = request.POST['valueIngredient_' + value_ingredient]
 
@@ -410,11 +410,9 @@ def recipe_edit(request, recipe_id):
 
         if form.is_valid():
             form.save()
-            recipe.ingredientamount_set.all().delete()
+            recipe.ingredient_recipe_set.all().delete()
 
-            objs = [Ingredient_Recipe(
-                amount=amount, ingredient=Ingredient.objects.get(name=name),
-                recipe=recipe) for name, amount in ingredients.items()]
+            objs = [Ingredient_Recipe(amount=int(amount), ingredient=Ingredient.objects.get(name=name),recipe=recipe) for name, amount in ingredients.items()]
 
             Ingredient_Recipe.objects.bulk_create(objs)
             return redirect('recipe_id', recipe_id=recipe_id)
