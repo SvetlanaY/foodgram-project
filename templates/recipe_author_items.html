@@ -9,10 +9,13 @@
        
         
         <ul class="card-user__items">
-        {% for recipe in recipes|slice:":3" %}
+        
+        
+        {% for recipe in recipes %}
+        {% if recipe.author == author   %}
        
-        {% if recipe.author == author %}
-
+       
+          
             <li class="card-user__item">
 
                
@@ -25,14 +28,17 @@
                      {% endthumbnail %} -->
                     
                      
-                     <img src="{{ recipe.image.url }}" alt="какой-то-текст" class="recipe__image">
+                     <img src="{{ recipe.image.url }}" alt="{{recipe.name}}" class="recipe__image">
                     <!-- <img src="./images/testCardImg.png" alt="какой-то-текст" class="recipe__image"> -->
                     <h3 class="recipe__title">{{recipe.name}}</h3>
                     <p class="recipe__text"><span class="icon-time"></span> {{recipe.time}} мин.</p>
                 </div>
             </li>
-            {% endif %}
+           
+           {% endif %}
             {% endfor %}
+           
+            {{count_recipes}}
             {% for key, value in count_recipes.items %} 
             
  {% if key == author.username and value > 0  %}

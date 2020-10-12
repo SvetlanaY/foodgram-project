@@ -252,16 +252,22 @@ def server_error(request):
 def follow_index(request):
     authors = Follow.objects.get_or_create(user=request.user)[0].author.prefetch_related('recipes')
     recipes = Recipe.objects.filter(author__in=authors).all()
+
+
     shop_list = ShopList.objects.get_or_create(user=request.user)[0].recipes.all()
     count_recipes={}
     for author in authors:
         count_recipes[author.username]=Recipe.objects.filter(author=author).count()-3
 
+    author_recipes={}
+    for author in authors:
+        author_recipes[author.username]=Recipe.objects.filter(author=author)   
+
     paginator = Paginator(recipes, 3)
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
 
-    return render(request, "myFollow.html", {"page": page, "paginator": paginator, "recipes": recipes, "authors": authors,"count_recipes":count_recipes,"shop_list":shop_list})
+    return render(request, "myFollow.html", {"page": page, "paginator": paginator, "recipes": recipes, "authors": authors,"count_recipes":count_recipes,"author_recipes":author_recipes,"shop_list":shop_list})
 
 
 # authors_list = FollowAuthor.objects.get_or_create(
