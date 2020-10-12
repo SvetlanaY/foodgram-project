@@ -1,4 +1,3 @@
-tagname,style_prefix,slug
-завтрак,orange,breakfast
-обед,green,lunch
-ужин,purple,supper
+завтрак,breakfast,orange
+обед,lunch,green
+ужин,dinner,purple
