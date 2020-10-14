@@ -1,5 +1,4 @@
-
-
+{% load format_recipes %}
     <div class="card-user" data-author="{{ author.id }}">
     <div class="card-user__header">
         <h2 class="card-user__title">{{author.username}}</h2>
@@ -10,11 +9,11 @@
         
         <ul class="card-user__items">
         
-        
-        {% for recipe in recipes %}
-        {% if recipe.author == author   %}
-       
-       
+      {%  for recipes_list in recipes_for_print %}
+      {%  for recipe in recipes_list %}
+
+       {% if recipe.author == author %} 
+     
           
             <li class="card-user__item">
 
@@ -34,11 +33,10 @@
                     <p class="recipe__text"><span class="icon-time"></span> {{recipe.time}} мин.</p>
                 </div>
             </li>
+            {% endif %}
+        {% endfor %}
+        {% endfor %}
            
-           {% endif %}
-            {% endfor %}
-           
-            {{count_recipes}}
             {% for key, value in count_recipes.items %} 
             
  {% if key == author.username and value > 0  %}
@@ -47,8 +45,11 @@
                 <a href="{% url 'profile' author.username %}"
                          class="card-user__link link">
                          Еще {{ value }}
-                          {{ 'рецепт' }}...</a>
+                         {{ 'рецепт'|format_recipes_count:value }}
+                        ...
+                    </a>
                           {% endif %}
+                         
 {% endfor %}
 
             </li>
@@ -75,10 +76,10 @@
 
         </ul>
     </div>
-
-    <div class="card-user__footer">
-        {% csrf_token %}
-        <button class="button button_style_light-blue button_size_auto" name="subscribe">Отписаться</button>
+    {% csrf_token %}
+    <div class="card-user__footer">      
+        <button class="button button_style_light-blue button_size_auto" name="subscribe" onclick='window.location.reload()'>Отписаться</button>    
+        
     </div>
 </div>
 

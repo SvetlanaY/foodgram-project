@@ -55,9 +55,7 @@
 
                 <div class="form__field-group">
                     <div class="tags">    
-                        {% for tag_choice, tag_value in form.tag.field.choices %}                    
-{{tag_choice}}
-{% endfor %}
+
                         {% for tag_model in form.fields.tag.choices.queryset %}
                         <div class="tags__item">
                             <input
@@ -108,7 +106,7 @@
                         {% if edit %}
                         {% for ingredient in form.instance.ingredient_recipe_set.all %}
                             <div class="form__field-item-ingredient" id="ing_{{ forloop.counter }}">
-                                <span>{{ ingredient.ingredient.title }} {{ ingredient.amount }} {{ ingredient.ingredient.dimension }}</span>
+                                <span>{{ ingredient.ingredient.name }} {{ ingredient.amount }} {{ ingredient.ingredient.dimension }}</span>
                                 <span class="form__field-item-delete"></span>
                                 <input id="nameIngredient_{{ forloop.counter }}" name="nameIngredient_{{ forloop.counter }}" type="hidden" value="{{ ingredient.ingredient.name }}">
                                 <input id="valueIngredient_{{ forloop.counter }}" name="valueIngredient_{{ forloop.counter }}" type="hidden" value="{{ ingredient.amount }}">

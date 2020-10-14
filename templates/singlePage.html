@@ -80,12 +80,26 @@
                     <p class="single-card__text"><span class="icon-time"></span> {{recipe.time}} мин.</p>
                     <ul class="single-card__items">
                         <li class="single-card__item"><p class="single-card__text"><span class="icon-user"></span> {{recipe.author}}</p></li>
+                       
+                        {% if user == recipe.author %}
+
                         <li class="single-card__item">  <a style="margin-left: 2.5em" href="{% url 'recipe_edit' recipe.id %}" class="single-card__text">Редактировать рецепт</a></li>
+                        {% endif %}
+
                     </ul>
                 </div>
                 <ul class="single-card__items">
                     
+                    
+
+                    {% if recipe not in shop_list %}
                     <li class="single-card__item"><button class="button button_style_blue" name="purchases" data-out><span class="icon-plus"></span> Добавить в покупки</button></li>
+                {% else %}
+                    <button class="button button_style_light-blue-outline" name="purchases">
+                        <span class="icon-check button__icon"></span>Рецепт добавлен</button>
+                {% endif %}
+                  
+
 
                     {% if user != recipe.author %}
                  

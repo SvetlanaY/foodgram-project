@@ -35,9 +35,9 @@ def index(request):
             tags_for_page+="filters="+filter+"&"
         tags_for_page_filter=tags_for_page[:-1]      
     else:
-        recipes_list = (Recipe.objects.all().order_by("-pub_date")) 
+        recipes_list = Recipe.objects.all().order_by("-pub_date")
         
-    paginator = Paginator(recipes_list, 3) 
+    paginator = Paginator(recipes_list, 6) 
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)   
              
@@ -48,18 +48,18 @@ def index(request):
         return render(request, "indexAuth.html", {"page": page, "paginator": paginator, "tags": tags, "filters":tags_for_page_filter,"favorites":favorites,"shop_list":shop_list})
     return render(request, "indexNotAuth.html", {"page": page, "paginator": paginator,"tags": tags,"filters":tags_for_page_filter})
 
-
+@login_required
 def ingredient_add(request):
     query=request.GET['query']
-    ingredients=Ingredient.objects.filter(name__istartswith=query).values('name', 'dimension').order_by()
+    ingredients_list=Ingredient.objects.filter(name__istartswith=query).values('name', 'dimension').order_by()
     # ingredients=[]
     # for i in ingredients_1:
-    #     ingredients.append({"name":i['name'].encode().decode(),"dimension":i['dimension'].encode('unicode-escape').decode('unicode-escape')})
+    #     ingredients.append({"name":i['name'].encode('utf-8').decode(),"dimension":i['dimension'].encode('utf-8').decode()})
        
-   
+
     
     
-    return JsonResponse(list(ingredients), safe=False)
+    return JsonResponse(list(ingredients_list), safe=False)
 
       
 
@@ -90,24 +90,8 @@ def new_recipe(request):
     shop_list = ShopList.objects.get_or_create(user=request.user)[0].recipes.all()     
 
     return render(request, 'formRecipe.html', {'form': form,'new_recipe': new_recipe,"shop_list":shop_list})
-    #    context = {
-    #     "title": "Создание рецепта",
-    #     "button": "Создать рецепт",
-    #     "form": form,
-         
-    # }
-    # if request.method == "POST":
-    #     if form.is_valid():
-    #         recipe = form.save(commit=False)
-    #         recipe.author = request.user
-    #         recipe.save()
-    #         return redirect("index")
-    # return render(request, "formRecipe.html", context)
-
-# class RecipeCreateView(LoginRequiredMixin, CreateView):
-#     form_class = RecipeCreateOrUpdateForm    
-
-
+    
+    
 def profile(request, username):
     profile = get_object_or_404(User, username=username)
     recipes = Recipe.objects.filter(author=profile).order_by("-pub_date").all()
@@ -125,7 +109,7 @@ def profile(request, username):
     else:
         recipes_list = recipes
      
-    paginator = Paginator(recipes_list, 3)
+    paginator = Paginator(recipes_list, 6)
     page_number = request.GET.get("page")    
     page = paginator.get_page(page_number)
 
@@ -251,23 +235,24 @@ def server_error(request):
 @login_required
 def follow_index(request):
     authors = Follow.objects.get_or_create(user=request.user)[0].author.prefetch_related('recipes')
-    recipes = Recipe.objects.filter(author__in=authors).all()
-
+    recipes = Recipe.objects.filter(author__in=authors).all().order_by("-pub_date")
 
     shop_list = ShopList.objects.get_or_create(user=request.user)[0].recipes.all()
     count_recipes={}
     for author in authors:
         count_recipes[author.username]=Recipe.objects.filter(author=author).count()-3
 
-    author_recipes={}
+    recipes_for_print=[]
     for author in authors:
-        author_recipes[author.username]=Recipe.objects.filter(author=author)   
+        recipes_for_print.append(Recipe.objects.filter(author=author).order_by("-pub_date")[:3])    
 
-    paginator = Paginator(recipes, 3)
+
+
+    paginator = Paginator(authors, 6)
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
 
-    return render(request, "myFollow.html", {"page": page, "paginator": paginator, "recipes": recipes, "authors": authors,"count_recipes":count_recipes,"author_recipes":author_recipes,"shop_list":shop_list})
+    return render(request, "myFollow.html", {"page": page, "paginator": paginator, "recipes": recipes, "authors": authors,"count_recipes":count_recipes,"shop_list":shop_list,"recipes_for_print":recipes_for_print})
 
 
 # authors_list = FollowAuthor.objects.get_or_create(
@@ -356,7 +341,7 @@ def favorite_index(request):
        
     shop_list = ShopList.objects.get_or_create(user=request.user)[0].recipes.all()
 
-    paginator = Paginator(recipes_list, 3)
+    paginator = Paginator(recipes_list, 6)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
    # favorite_page = True
@@ -459,27 +444,49 @@ def purchases_delete(request, recipe_id):
     return JsonResponse({'success': True})  
 
 
-def download_shop_list(request):
+# def download_shop_list(request):
+#     shop_list = get_object_or_404(ShopList, user=request.user)
+#     recipes = shop_list.recipes.all()
+
+#     ingredient_list = recipes.annotate(name1=F('ingredient_recipe__ingredient__name'),
+#         dimension=F('ingredient_recipe__ingredient__dimension')
+#     ).values(
+#         'name1', 'dimension'
+#     ).annotate(
+#         total=Sum('ingredient_recipe__amount')
+#     ).order_by('name1')
+
+#     response = HttpResponse(content_type='text/txt')
+#     response['Content-Disposition'] = 'attachment; filename="shop-list.txt"'
+
+#     writer = csv.writer(response)
+
+#     for ingredient in ingredient_list:
+#         name1 = ingredient['name1']
+#         dimension = ingredient['dimension']
+#         total = ingredient['total']
+#         writer.writerow([f'{name1} ({dimension}) - {total}'])
+
+#     return response
+
+
+def download_shop_list(request):    
     shop_list = get_object_or_404(ShopList, user=request.user)
     recipes = shop_list.recipes.all()
-
-    ingredient_list = recipes.annotate(name1=F('ingredient_recipe__ingredient__name'),
-        dimension=F('ingredient_recipe__ingredient__dimension')
-    ).values(
-        'name1', 'dimension'
-    ).annotate(
-        total=Sum('ingredient_recipe__amount')
-    ).order_by('name1')
+    ingredients=Ingredient_Recipe.objects.filter(recipe__in= recipes).select_related('ingredient').values('ingredient__name','amount','ingredient__dimension').annotate(amounts=Sum('amount')).all()
+  
+  
 
     response = HttpResponse(content_type='text/txt')
     response['Content-Disposition'] = 'attachment; filename="shop-list.txt"'
 
     writer = csv.writer(response)
+   
 
-    for ingredient in ingredient_list:
-        name1 = ingredient['name1']
-        dimension = ingredient['dimension']
-        total = ingredient['total']
-        writer.writerow([f'{name1} ({dimension}) - {total}'])
+    for ingredient in ingredients:
+        name = ingredient['ingredient__name']
+        dimension = ingredient['ingredient__dimension']
+        amounts = ingredient['amounts']
+        writer.writerow([f'{name} ({dimension}) - {amounts}'])
 
-    return response
+    return response    

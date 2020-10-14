@@ -40,10 +40,10 @@
       
        
         {% if recipe not in favorites %}
-        <button class="button button_style_none" name="favorites" data-out>
-            <span class="icon-favorite"></span></button>
+        <button class="button button_style_none" name="favorites" data-out onclick='window.location.reload()'>
+            <span class="icon-favorite" ></span></button>
     {% else %}
-        <button class="button button_style_none" name="favorites">
+        <button class="button button_style_none" name="favorites"  onclick='window.location.reload()' >
             <span class="icon-favorite icon-favorite_active"></span></button>
     {% endif %}
 {% endif %}
