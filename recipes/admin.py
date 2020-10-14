@@ -7,7 +7,7 @@ from .models import Recipe,Ingredient,Tag, Ingredient_Recipe,Favorite
 
 class IngredientAdmin(admin.ModelAdmin):
     list_display = ("name", "dimension", "id")
-    list_filter = ("name",)
+    list_filter=("name",)
     search_fields = ('name', )
     empty_value_display = "-пусто-" # noqa
 

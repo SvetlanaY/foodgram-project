@@ -9,7 +9,7 @@ from django.db.models.aggregates import Count,Sum
 from django.http import HttpResponse, HttpResponseRedirect, request
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import RecipeForm,RecipeCreateForm
+from .forms import RecipeCreateForm
 from .models import Recipe,Follow,User,Ingredient_Recipe,Favorite,Tag,Ingredient,ShopList
 
 def get_ingredients(request):
@@ -92,50 +92,6 @@ def new_recipe(request):
     return render(request, 'formRecipe.html', {'form': form,'new_recipe': new_recipe,"shop_list":shop_list})
     
     
-def profile(request, username):
-    profile = get_object_or_404(User, username=username)
-    recipes = Recipe.objects.filter(author=profile).order_by("-pub_date").all()
-    
-
-    tags_for_page_filter=''    
-    tags=Tag.objects.all()
-    if 'filters' in request.GET:
-        filters = request.GET.getlist("filters")
-        recipes_list=Recipe.objects.filter(tag__slug__in=filters,author=profile).order_by("-pub_date").distinct()        
-        tags_for_page=''
-        for filter in filters:
-            tags_for_page+="filters="+filter+"&"
-        tags_for_page_filter=tags_for_page[:-1]      
-    else:
-        recipes_list = recipes
-     
-    paginator = Paginator(recipes_list, 6)
-    page_number = request.GET.get("page")    
-    page = paginator.get_page(page_number)
-
-   
-
-    context = {
-      
-        "page": page,
-        "paginator": paginator,
-      
-        "author": profile,
-      
-        "tags": tags,
-        "filters":tags_for_page_filter
-    }
-
-    if request.user.is_authenticated:
-        favorites = Favorite.objects.get_or_create(user=request.user)[0].recipes.all() 
-        subscriptions = Follow.objects.get_or_create(user=request.user)[0].author.all() 
-        shop_list = ShopList.objects.get_or_create(user=request.user)[0].recipes.all()
-        context["favorites"]=favorites
-        context["subscriptions"] = subscriptions
-        context["shop_list"] = shop_list
-
-
-    return render(request, "authorRecipe.html", context)
 
 
 def recipe_view(request, username, recipe_id):
@@ -177,59 +133,12 @@ def recipe_view_id (request, recipe_id):
     return render(request, "singlePageNotAuth.html", {"recipe": recipe})  
 
 
-# def post_edit(request, username, post_id):
-#     post = get_object_or_404(Post, id=post_id)
-#     user = get_object_or_404(User, username=username)
-
-#     if request.user != user:
-#         return redirect("post", username=user.username, post_id=post_id)
-
-#     form = PostForm(request.POST or None,
-#                     files=request.FILES or None, instance=post)
-#     context = {
-#         "title": "Редактировать запись",
-#         "button": "Сохранить",
-#         "post": post,
-#         "form": form,
-#     }
-#     if request.method == "POST":
-#         if form.is_valid():
-#             post.save()
-#             return redirect("post", username=user.username, post_id=post_id)
-#     return render(request, "new_post.html", context)
-
-
-# def post_remove(request, username, post_id):
-#     post = get_object_or_404(Post, id=post_id)
-#     if request.user != post.author:
-#         return redirect("post", username=post.author, post_id=post.id)
-#     post = get_object_or_404(Post, id=post_id)
-#     post.delete()
-#     return redirect("index")
-
-
 def page_not_found(request, exception):
     return render(request, "404.html", {"path": request.path}, status=404)
 
 
 def server_error(request):
     return render(request, "500.html", status=500)
-
-
-# @login_required
-# def add_comment(request, username, post_id):
-#     post = get_object_or_404(Post, id=post_id)
-#     user = get_object_or_404(User, username=username)
-#     if request.method == "POST":
-#         form = CommentForm(request.POST)
-#         if form.is_valid():
-#             comment = form.save(commit=False)
-#             comment.post = post
-#             comment.author = request.user
-#             comment.save()
-#             return redirect("post", username=user.username, post_id=post_id)
-#     form = CommentForm()
-#     return redirect("post", username=user.username, post_id=post_id)
 
 
 @login_required
@@ -384,9 +293,8 @@ def favorites_delete(request, id):
 
 @login_required
 def recipe_edit(request, recipe_id):
-    new_recipe = True
+   
     edit = True
-
     recipe = get_object_or_404(Recipe.objects.prefetch_related('tag'), id=recipe_id)
 
     if request.user != recipe.author:
@@ -403,7 +311,7 @@ def recipe_edit(request, recipe_id):
             form.save()
             recipe.ingredient_recipe_set.all().delete()
 
-            objs = [Ingredient_Recipe(amount=int(amount), ingredient=Ingredient.objects.get(name=name),recipe=recipe) for name, amount in ingredients.items()]
+            objs = [Ingredient_Recipe(amount=amount, ingredient=Ingredient.objects.get(name=name),recipe=recipe) for name, amount in ingredients.items()]
 
             Ingredient_Recipe.objects.bulk_create(objs)
             return redirect('recipe_id', recipe_id=recipe_id)
@@ -412,7 +320,7 @@ def recipe_edit(request, recipe_id):
 
     return render(
         request, 'formRecipe.html',
-        {'form': form, 'new_recipe': new_recipe, 'edit': edit})
+        {'form': form,  'edit': edit})
 
 
 @login_required
@@ -444,39 +352,12 @@ def purchases_delete(request, recipe_id):
     return JsonResponse({'success': True})  
 
 
-# def download_shop_list(request):
-#     shop_list = get_object_or_404(ShopList, user=request.user)
-#     recipes = shop_list.recipes.all()
-
-#     ingredient_list = recipes.annotate(name1=F('ingredient_recipe__ingredient__name'),
-#         dimension=F('ingredient_recipe__ingredient__dimension')
-#     ).values(
-#         'name1', 'dimension'
-#     ).annotate(
-#         total=Sum('ingredient_recipe__amount')
-#     ).order_by('name1')
-
-#     response = HttpResponse(content_type='text/txt')
-#     response['Content-Disposition'] = 'attachment; filename="shop-list.txt"'
-
-#     writer = csv.writer(response)
-
-#     for ingredient in ingredient_list:
-#         name1 = ingredient['name1']
-#         dimension = ingredient['dimension']
-#         total = ingredient['total']
-#         writer.writerow([f'{name1} ({dimension}) - {total}'])
-
-#     return response
-
-
 def download_shop_list(request):    
     shop_list = get_object_or_404(ShopList, user=request.user)
     recipes = shop_list.recipes.all()
-    ingredients=Ingredient_Recipe.objects.filter(recipe__in= recipes).select_related('ingredient').values('ingredient__name','amount','ingredient__dimension').annotate(amounts=Sum('amount')).all()
+    ingredients=Ingredient_Recipe.objects.filter(recipe__in= recipes).select_related('ingredient').values('ingredient__name','ingredient__dimension').annotate(amounts=Sum('amount')).all()
   
   
-
     response = HttpResponse(content_type='text/txt')
     response['Content-Disposition'] = 'attachment; filename="shop-list.txt"'
 
