@@ -89,6 +89,7 @@
 
 
             <div class="form__group">
+                
                 <label for="nameIngredient" class="form__label">Ингредиенты</label>
                 <div class="form__field-group">
                     <div class="form__field-group-ingredientes">
@@ -188,6 +189,15 @@
                     <span class="form__error"></span> -->
                 </div>
             </div>
+
+            {% if form.errors %}
+            {% for error in form.non_field_errors %}
+                <div class="form__group">
+                <span class="form__error">{{ error|escape }}</span>
+                </div>
+            {% endfor %}
+        {% endif %}          
+
             <div class="form__footer">
                 <button type="submit" class="button button_style_blue">
                     {% if edit %} Сохранить {% else %} Создать рецепт {% endif %}</button>

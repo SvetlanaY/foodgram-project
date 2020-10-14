@@ -1,15 +1,12 @@
 const counterId = document.querySelector('#counter');
-
 const ingredientsContainer = document.querySelector('.form__field-group-ingredientes-container');
 const nameIngredient = document.querySelector('#nameIngredient');
 const formDropdownItems = document.querySelector('.form__dropdown-items');
 const cantidadVal = document.querySelector('#cantidadVal');
 const cantidad = document.querySelector('#cantidad')
 const addIng = document.querySelector('#addIng');
-
 const api = new Api(apiUrl);
 const header = new Header(counterId);
-
 const defineInitialIndex = function () {
     const ingredients = ingredientsContainer.querySelectorAll('.form__field-item-ingredient')
     if (ingredients.length === 0) { return 1 }
@@ -21,7 +18,6 @@ const defineInitialIndex = function () {
     data.sort((a, b) => a-b)
     return data[data.length - 1] + 1
 }
-
 function Ingredients() {
     let cur = defineInitialIndex();
     // клик по элементам с сервера
@@ -44,12 +40,10 @@ function Ingredients() {
                              <input id="valueIngredient_${cur}" name="valueIngredient_${cur}" type="hidden" value="${data.value}">
                              <input id="unitsIngredient_${cur}" name="unitsIngredient_${cur}" type="hidden" value="${data.units}">`;
             cur++;
-            
             ingredientsContainer.appendChild(elem);
         }
     };
     // удаление элемента
-
     const eventDelete = (e) => {
         if(e.target.classList.contains('form__field-item-delete')) {
             const item = e.target.closest('.form__field-item-ingredient');
@@ -80,7 +74,6 @@ function Ingredients() {
         dropdown
     }
 }
-
 const cbEventInput = (elem) => {
     return api.getIngredients(elem.target.value).then( e => {
         if(e.length !== 0 ) {
@@ -95,9 +88,7 @@ const cbEventInput = (elem) => {
         console.log(e)
     })
 };
-
 const eventInput = debouncing(cbEventInput, 1000);
-
 // вешаем апи
 nameIngredient.addEventListener('input', eventInput);
 const ingredients = Ingredients();
@@ -105,5 +96,3 @@ const ingredients = Ingredients();
 formDropdownItems.addEventListener('click', ingredients.dropdown);
 // вешаем слушатель на кнопку
 addIng.addEventListener('click', ingredients.addIngredient);
-
-

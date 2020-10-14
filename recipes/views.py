@@ -51,7 +51,7 @@ def index(request):
 @login_required
 def ingredient_add(request):
     query=request.GET['query']
-    ingredients_list=Ingredient.objects.filter(name__istartswith=query).values('name', 'dimension').order_by()
+    ingredients_list=Ingredient.objects.filter(name__istartswith=query).extra(select={'title': 'name'}).values('title', 'dimension').order_by()
     # ingredients=[]
     # for i in ingredients_1:
     #     ingredients.append({"name":i['name'].encode('utf-8').decode(),"dimension":i['dimension'].encode('utf-8').decode()})
@@ -73,12 +73,14 @@ def new_recipe(request):
         ingredients = get_ingredients(request)
         if not bool(ingredients):
             form.add_error(None, "Добавьте хотя бы один ингредиент")
+          
+        
 
         elif form.is_valid():
             recipe = form.save(commit=False)
             recipe.author = request.user
             recipe.save()
-
+            
             objs = [Ingredient_Recipe(amount=amount, ingredient=Ingredient.objects.get(name=name),recipe=recipe) for name, amount in ingredients.items()]
 
             Ingredient_Recipe.objects.bulk_create(objs)
