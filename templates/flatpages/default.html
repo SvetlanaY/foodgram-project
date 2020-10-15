@@ -1,24 +1,20 @@
 {% extends "base.html" %}
 {% block title %} {{ flatpage.title }} {% endblock %}
 
-{% block main_title %}
-
-{% endblock %}
+{% block main_title %}{% endblock %}
 
 {% block static_stylesheet %}
 {% load static %}
 <link rel="stylesheet" href="{% static './pages/index.css' %}">
-         
- {% endblock static_stylesheet %}
- {% block menu %}
+{% endblock static_stylesheet %}
 
- {% include "menu.html" with index=True %}
+{% block menu %}
+{% include "menu.html" with index=True %}
 {% endblock %}
+
 {% block content %}
-
 <div class="container">
-        <h1>{{ flatpage.title }}</h1>
-        {{ flatpage.content }}
+  <h1>{{ flatpage.title }}</h1>
+  {{ flatpage.content }}
 </div>
-
 {% endblock %}

@@ -7,11 +7,9 @@
             <li class="{% if new_recipe %} nav__item_active {% endif %} nav__item"><a href="/new/" class="nav__link link">Создать рецепт</a></li>
             <li class=" {% if myfavorites %} nav__item_active  {% endif %}  nav__item  "><a href="/myfavorites" class="nav__link link">Избранное</a></li>
             <li class="{% if purchase %} nav__item_active {% endif %} nav__item"><a href="/shop-list" class="nav__link link">Список покупок</a> <span class="badge badge_style_blue nav__badge" id="counter">{{ shop_list.count }}</span></li>
-
         </ul>
         {% else %}
         <ul class="nav__items list">
             <li class="{% if index %} nav__item_active {% endif %} nav__item"><a href="/" class="nav__link link">Рецепты</a></li>
-           
         </ul>
-        {% endif %}
+    {% endif %}

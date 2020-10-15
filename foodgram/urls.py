@@ -23,30 +23,19 @@ from django.contrib.flatpages import views
 from django.conf.urls import handler404, handler500
 
 
-
 handler404 = "recipes.views.page_not_found"  # noqa
 handler500 = "recipes.views.server_error"  # noqa
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    # flatpages
-    path('about-author/', views.flatpage,
-          {'url': '/about-author/'}, name='about-author'),
-    path('about-spec/', views.flatpage,
-          {'url': '/about-spec/'}, name='about-spec'),
+    path("about-author/", views.flatpage, {"url": "/about-author/"}, name="about-author"),
+    path("about-spec/", views.flatpage, {"url": "/about-spec/"}, name="about-spec"),
     path("about/", include("django.contrib.flatpages.urls")),
-     # регистрация и авторизация
-    path("auth/", include("users.urls")),
-    # если нужного шаблона для /auth не нашлось в файле users.urls —
-    # ищем совпадения в файле django.contrib.auth.urls
-    path("auth/", include("django.contrib.auth.urls")),
-    # импорт правил из приложения posts
     path("", include("recipes.urls")),
+    path("", include("users.urls")),
 ]
 
 
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL,
-                          document_root=settings.MEDIA_ROOT)
-    urlpatterns += static(settings.STATIC_URL,
-                          document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

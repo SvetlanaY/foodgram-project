@@ -2,7 +2,7 @@
 {% block title %} Рецепты  {% endblock %}
 {% block main_title %}
 <div class="main__header">
-  <h1 class="main__title">
+<h1 class="main__title">
 Рецепты
 </h1>
 {% endblock %}
@@ -10,78 +10,57 @@
 {% block static_stylesheet %}
 {% load static %}
 <link rel="stylesheet" href="{% static './pages/index.css' %}">
-         
- {% endblock static_stylesheet %}
+{% endblock static_stylesheet %}
 
 {% block menu %}
-
-          {% include "menu.html" with index=True %}
- {% endblock %}
+{% include "menu.html" with index=True %}
+{% endblock %}
  
- {% load recipe_tag %}
- {% block tags %}
- <ul class="tags">
-     
-    {% with filter_values=request.GET|tag_values %}
-    {% for tag in tags %}
-
- <li class="tags__item">
-     <a 
-     id='{{tag.slug}}'
-     class="tags__checkbox tags__checkbox_style_{{tag.style}} {% if tag.slug in filter_values %}tags__checkbox_active{% endif %}"
-     href="/?{{request|tag_link:tag}}">
-    </a>
-     
-     
-     <span class="tags__label">{{tag.name}}</span>
- </li>
- {% endfor %}
- {% endwith %}
- </ul>
+{% load recipe_tag %}
+{% block tags %}
+<ul class="tags">
+  {% with filter_values=request.GET|tag_values %}
+  {% for tag in tags %}
+    <li class="tags__item">
+      <a 
+      id='{{tag.slug}}'
+      class="tags__checkbox tags__checkbox_style_{{tag.style}} {% if tag.slug in filter_values %}tags__checkbox_active{% endif %}"
+      href="/?{{request|tag_link:tag}}">
+      </a>
+      <span class="tags__label">{{tag.name}}</span>
+    </li>
+  {% endfor %}
+  {% endwith %}
+</ul>
 </div> 
- {% endblock %}    
+{% endblock %}    
   
- <div class="container">
-          {% block content %} 
-        <div class="card-list">
-             <!-- Вывод ленты записей -->
-             {% for recipe in page %}
-             <!-- Вот он, новый include! -->
-             {% include "recipe_item.html" with recipe=recipe %}
-        {% endfor %}
-            </div>
-        
-                 <!-- Вывод паджинатора -->
-        
-                 <nav class="pagination" aria-label="Search results pages">
-                    <ul class="pagination__container">
-                 
-                 {% if page.has_other_pages %}
-        
-                 {% include "paginator.html" with items=page paginator=paginator%}
-                 
-                 {% endif %}
-        
-                </ul>
-            </nav> 
-          </body>
-            {% endblock %}  
- </div>
+<div class="container">
+{% block content %} 
+<div class="card-list">
+  {% for recipe in page %}
+    {% include "recipe_item.html" with recipe=recipe %}
+  {% endfor %}
+</div>
+<nav class="pagination" aria-label="Search results pages">
+  <ul class="pagination__container">
+    {% if page.has_other_pages %}
+      {% include "paginator.html" with items=page paginator=paginator%}
+    {% endif %}        
+  </ul>
+</nav> 
+</body>
+{% endblock %}  
+</div>
     
-
- {% block scripts_js %}
-     
-    {% load static %}
-    <script src="{% static 'js/config/config.js' %}"></script>
+{% block scripts_js %}     
+{% load static %}
+<script src="{% static 'js/config/config.js' %}"></script>
 <script src="{% static './js/components/MainCards.js' %}"></script>
 <script src="{% static './js/components/Purchases.js' %}"></script>
 <script src="{% static './js/components/Favorites.js' %}"></script>
 <script src="{% static './js/components/CardList.js' %}"></script>
 <script src="{% static './js/components/Header.js' %}"></script>
-
-
 <script src="{% static 'js/api/Api.js' %}"></script>
 <script src="{% static 'indexAuth.js' %}"></script>
-{% endblock %}
-        
-
+{% endblock %}   

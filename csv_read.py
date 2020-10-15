@@ -3,29 +3,32 @@ from django.db import migrations
 import sqlite3
 import pandas
 
-   
+
 def migration_ingredients(apps, schema_editor):
-    conn = sqlite3.connect('db.sqlite3')    
-    table =  "recipes_ingredient"
-    csv_file =  "ingredients.csv"    
+    conn = sqlite3.connect('db.sqlite3')
+    table = "recipes_ingredient"
+    csv_file = "ingredients.csv"
     filepath = f'data/{csv_file}'
     with open(filepath) as f:
-        f = pandas.read_csv(filepath)        
-        f.columns = ['name', 'dimension']           
-        f.to_sql(table, conn,  if_exists='append', index=True, index_label="id")       
+        f = pandas.read_csv(filepath)
+        f.columns = ['name', 'dimension']
+        f.to_sql(table, conn,  if_exists='append',
+                 index=True, index_label="id")
     conn.close()
 
 
 def migration_tags(apps, schema_editor):
-    conn = sqlite3.connect('db.sqlite3')    
-    table =  "recipes_tag"
-    csv_file =  "tags.csv"    
+    conn = sqlite3.connect('db.sqlite3')
+    table = "recipes_tag"
+    csv_file = "tags.csv"
     filepath = f'data/{csv_file}'
     with open(filepath) as f:
-        f = pandas.read_csv(filepath)        
-        f.columns = ['name', 'slug', 'style']           
-        f.to_sql(table, conn,  if_exists='append', index=True, index_label="id")       
+        f = pandas.read_csv(filepath)
+        f.columns = ['name', 'slug', 'style']
+        f.to_sql(table, conn,  if_exists='append',
+                 index=True, index_label="id")
     conn.close()
+
 
 class Migration(migrations.Migration):
 
@@ -34,5 +37,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(migration_ingredients),migrations.RunPython(migration_tags),
+        migrations.RunPython(
+            migration_ingredients), migrations.RunPython(migration_tags),
     ]

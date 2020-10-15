@@ -3,63 +3,45 @@
 {% block title %} Список покупок  {% endblock %}
 {% block main_title %}
 <div class="main__header">
-    <h1 class="main__title">
-        Список покупок
-    </h1>
-    </div>
+  <h1 class="main__title">Список покупок</h1>
+</div>
 {% endblock %}
 
 {% block static_stylesheet %}
 {% load static %}
 <link rel="stylesheet" href="{% static './pages/shopList.css' %}">
-         
- {% endblock static_stylesheet %}
-
- 
+{% endblock static_stylesheet %}
 
 {% block menu %}
-
-          {% include "menu.html" with purchase=True %}
- {% endblock %}
+{% include "menu.html" with purchase=True %}
+{% endblock %}
  
 {% block content %}
-
- 
-
-
 {% csrf_token %}
-    <div class="card-list card-list_column">
-        <ul class="shopping-list">
-            {% for recipe in shop_list %}
-            <li class="shopping-list__item" data-id="{{ recipe.id }}">
-                <div class="recipe recipe_reverse">
-                    <img src="{{ recipe.image.url }}" alt="{{ recipe.name }}" class="recipe__image recipe__image_big">
-                    <h3 class="recipe__title">{{ recipe.name }}</h3>
-                    <p class="recipe__text"><span class="icon-time"></span> {{recipe.time}} мин.</p>
-                </div>
-                <a href="#" class="shopping-list__button link">Удалить</a>
-            </li>
+<div class="card-list card-list_column">
+  <ul class="shopping-list">
+    {% for recipe in shop_list %}
+      <li class="shopping-list__item" data-id="{{ recipe.id }}">
+        <div class="recipe recipe_reverse">
+          <img src="{{ recipe.image.url }}" alt="{{ recipe.name }}" class="recipe__image recipe__image_big">
+          <h3 class="recipe__title">{{ recipe.name }}</h3>
+          <p class="recipe__text"><span class="icon-time"></span> {{recipe.time}} мин.</p>
+        </div>
+        <a href="#" class="shopping-list__button link">Удалить</a>
+      </li>
+    {% endfor %}
+  </ul>
+  {% if shop_list %}
+    <a href="/shop-list/download"><button class="button button_style_blue">Скачать список</button></a>
+  {% endif %}
+</div>
+{% endblock content %} 
 
-            {% endfor %}
-        </ul>
-        {% if shop_list %}
-        <a href="/shop-list/download"><button class="button button_style_blue">Скачать список</button></a>
-    {% endif %}
-    </div>
-    {% endblock content %}    
-  
-  
-   
-
-    {% block scripts_js %}
-    {% load static %}
-    <script src="{% static './js/config/config.js' %}"></script>
-    <script src="{% static './js/components/ShopList.js' %}"></script>
-    
-    <script src="{% static './js/components/Header.js' %}"></script>
-    <script src="{% static './js/api/Api.js' %}"></script>
-    <script src="{% static 'shopList.js' %}"></script>
-   
-    {% endblock %}
-
-
+{% block scripts_js %}
+{% load static %}
+<script src="{% static './js/config/config.js' %}"></script>
+<script src="{% static './js/components/ShopList.js' %}"></script>
+<script src="{% static './js/components/Header.js' %}"></script>
+<script src="{% static './js/api/Api.js' %}"></script>
+<script src="{% static 'shopList.js' %}"></script>
+{% endblock %}

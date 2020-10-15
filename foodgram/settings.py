@@ -26,9 +26,9 @@ SECRET_KEY = 'if^#8m=sat@79$wp7860+jj82169=*@9i0ah*t-_puo36n-sm2'
 DEBUG = True
 
 ALLOWED_HOSTS = ["localhost",
-        "127.0.0.1",
-        "[::1]",
-        "testserver",]
+                 "127.0.0.1",
+                 "[::1]",
+                 "testserver", ]
 
 
 # Application definition
@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'sorl.thumbnail',
-    
+
 ]
 
 MIDDLEWARE = [
@@ -135,10 +135,9 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
-
 LOGIN_URL = "/auth/login/"
-LOGIN_REDIRECT_URL = "index" 
-LOGOUT_REDIRECT_URL = "index" 
+LOGIN_REDIRECT_URL = "index"
+LOGOUT_REDIRECT_URL = "index"
 
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
@@ -148,10 +147,9 @@ THUMBNAIL_QUALITY = 60
 THUMBNAIL_PROGRESSIVE = False
 
 CACHES = {
-        'default': {
-                'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        }
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    }
 }
 
 SITE_ID = 1
-

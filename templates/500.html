@@ -1,29 +1,24 @@
-{% extends "base.html" %} 
+{% extends "base.html" %}
 {% block title %} Ошибка 500 {% endblock %}
-{% block main_title %}
-
-{% endblock %}
+{% block main_title %}{% endblock %}
 
 {% block static_stylesheet %}
 {% load static %}
 <link rel="stylesheet" href="{% static './pages/index.css' %}">
-         
- {% endblock static_stylesheet %}
+{% endblock static_stylesheet %}
 
 {% block menu %}
+{% include "menu.html" with index=True %}
+{% endblock %}
 
-          {% include "menu.html" with index=True %}
- {% endblock %}
 {% block content %}
-
 <main role="main" class="container">
-<div class="row">
-    <div class="col-md-12">
-        <h1>Ошибка 500</h1>
-        <p class="lead">Ошибка на сервере, попробуйте обновить страницу или обратиться позже</p>
-        <p class="lead"><a href="{% url 'index' %}">Вернуться на главную</a></p>
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Ошибка 500</h1>
+            <p class="lead">Ошибка на сервере, попробуйте обновить страницу или обратиться позже</p>
+            <p class="lead"><a href="{% url 'index' %}">Вернуться на главную</a></p>
+        </div>
     </div>
-</div>
 </main>
-
-{% endblock %} 
+{% endblock %}

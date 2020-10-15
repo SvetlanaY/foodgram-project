@@ -1,93 +1,48 @@
 {% load format_recipes %}
-    <div class="card-user" data-author="{{ author.id }}">
+  <div class="card-user" data-author="{{ author.id }}">
     <div class="card-user__header">
-        <h2 class="card-user__title">{{author.username}}</h2>
+      <h2 class="card-user__title">{{author.username}}</h2>
     </div>
-
     <div class="card-user__body">
-       
-        
-        <ul class="card-user__items">
-        
-      {%  for recipes_list in recipes_for_print %}
-      {%  for recipe in recipes_list %}
-
-       {% if recipe.author == author %} 
-     
-          
-            <li class="card-user__item">
-
-               
-
+      <ul class="card-user__items">        
+        {%  for recipes_list in recipes_for_print %}
+          {%  for recipe in recipes_list %}
+            {% if recipe.author == author %}
+              <li class="card-user__item">
                 <div class="recipe">
-
-                    <!-- {% load thumbnail %}
-                    {% thumbnail recipe.image "960x339" crop="center" upscale=True as im %}
-                     <img class="card__image" src="{{ recipe.image.url }}" alt="фото рецепта"  >
-                     {% endthumbnail %} -->
-                    
-                     
-                     <img src="{{ recipe.image.url }}" alt="{{recipe.name}}" class="recipe__image">
-                    <!-- <img src="./images/testCardImg.png" alt="какой-то-текст" class="recipe__image"> -->
-                    <h3 class="recipe__title">{{recipe.name}}</h3>
-                    <p class="recipe__text"><span class="icon-time"></span> {{recipe.time}} мин.</p>
+                  <img src="{{ recipe.image.url }}" alt="{{recipe.name}}" class="recipe__image">                   
+                  <h3 class="recipe__title">{{recipe.name}}</h3>
+                  <p class="recipe__text"><span class="icon-time"></span> {{recipe.time}} мин.</p>
                 </div>
-            </li>
+              </li>
             {% endif %}
+          {% endfor %}
         {% endfor %}
+        {% for key, value in count_recipes.items %}             
+          {% if key == author.username and value > 0  %}
+            <li class="card-user__item">
+              <a href="{% url 'profile' author.username %}"
+                class="card-user__link link">
+                Еще {{ value }}
+                {{ 'рецепт'|format_recipes_count:value }}
+                ...
+              </a>
+            </li>  
+          {% endif %}                         
         {% endfor %}
-           
-            {% for key, value in count_recipes.items %} 
-            
- {% if key == author.username and value > 0  %}
-           
-            <li class="card-user__item">
-                <a href="{% url 'profile' author.username %}"
-                         class="card-user__link link">
-                         Еще {{ value }}
-                         {{ 'рецепт'|format_recipes_count:value }}
-                        ...
-                    </a>
-                          {% endif %}
-                         
-{% endfor %}
-
-            </li>
-           
-            <!-- <li class="card-user__item">
-                <div class="recipe">
-                    <img src="./images/testCardImg.png" alt="какой-то-текст" class="recipe__image">
-                    <h3 class="recipe__title">Французские тосты</h3>
-                    <p class="recipe__text"><span class="icon-time"></span> 20 мин.</p>
-                </div>
-            </li>
-            <li class="card-user__item">
-                <div class="recipe">
-                    <img src="./images/testCardImg.png" alt="какой-то-текст" class="recipe__image">
-                    <h3 class="recipe__title">Французские тосты</h3>
-                    <p class="recipe__text"><span class="icon-time"></span> 20 мин.</p>
-                </div>
-            </li>
-            <li class="card-user__item">
-                <a href="#" class="card-user__link link">Еще 7 рецептов...</a>
-            </li> -->
-            
-
-
-        </ul>
+      </ul>
     </div>
     {% csrf_token %}
     <div class="card-user__footer">      
-        <button class="button button_style_light-blue button_size_auto" name="subscribe" onclick='window.location.reload()'>Отписаться</button>    
-        
+      <button class="button button_style_light-blue button_size_auto" name="subscribe" onclick='window.location.reload()'>Отписаться</button>    
     </div>
-</div>
+  </div>
 
 {% load static %}
- <script src="{% static './js/config/config.js' %}"></script>
- <script src="{% static './js/components/MainCards.js' %}"></script>
- <script src="{% static './js/components/MyFollow.js' %}"></script>
- <script src="{% static './js/components/Subscribe.js' %}"></script>
- <script src="{% static './js/components/Header.js' %}"></script>
- <script src="{% static './js/api/Api.js' %}"></script>
- <script src="{% static 'myFollow.js' %}"></script>
+<script src="{% static './js/config/config.js' %}"></script>
+<script src="{% static './js/components/MainCards.js' %}"></script>
+<script src="{% static './js/components/MyFollow.js' %}"></script>
+<script src="{% static './js/components/Subscribe.js' %}"></script>
+<script src="{% static './js/components/Header.js' %}"></script>
+<script src="{% static './js/api/Api.js' %}"></script>
+<script src="{% static 'myFollow.js' %}"></script>
