@@ -101,9 +101,9 @@ class Favorite(models.Model):
 
 class ShopList(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE,
-                             related_name='shop_list', verbose_name='Пользователь')
+                             related_name='shop_lists', verbose_name='Пользователь')
     recipes = models.ManyToManyField(
-        Recipe, related_name='shop_list', verbose_name='Рецепты', blank=True)
+        Recipe, related_name='shop_lists', verbose_name='Рецепты', blank=True)
 
     def __str__(self):
         return f'Список покупок {self.user}'
