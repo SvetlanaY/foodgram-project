@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.db import models
 
-from .models import (Favorite, Follow, Ingredient, IngredientRecipe, Recipe, Tag, User)
+from .models import (Follow, Ingredient, IngredientRecipe, Recipe, Tag)
 
 
 class IngredientAdmin(admin.ModelAdmin):
@@ -13,7 +13,7 @@ class IngredientAdmin(admin.ModelAdmin):
 
 class RecipeAdmin(admin.ModelAdmin):
     def favorites_count(self, obj):
-        return obj.favorite_recipes.count()
+        return obj.favorites.count()
 
     favorites_count.short_description = "Число добавлений в Избранное"
     search_fields = ("name", )

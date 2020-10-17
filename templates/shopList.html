@@ -32,7 +32,7 @@
     {% endfor %}
   </ul>
   {% if shops %}
-    <a href="/shop-list/download"><button class="button button_style_blue">Скачать список</button></a>
+    <a href="{% url  'download_shops' %}"><button class="button button_style_blue">Скачать список</button></a>
   {% endif %}
 </div>
 {% endblock content %} 

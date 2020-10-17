@@ -22,7 +22,7 @@
     <li class="tags__item">
       <a id='{{ tag.slug }}'
       class="tags__checkbox tags__checkbox_style_{{ tag.style }} {% if tag.slug in filter_values %}tags__checkbox_active{% endif %}"
-      href="/{{ author }}/?{{ request|tag_link:tag }}">
+      href="{% url 'profile' author %}?{{request|tag_link:tag }}">    
       </a>
       <span class="tags__label">{{ tag.name }}</span>
     </li>
