@@ -35,7 +35,7 @@ class Recipe(models.Model):
     description = models.CharField(max_length=280)
     ingredients = models.ManyToManyField(
         Ingredient, related_name='recipes',
-        through='Ingredient_Recipe',
+        through='IngredientRecipe',
         through_fields=('recipe', 'ingredient'),
     )
     tag = models.ManyToManyField(
@@ -59,7 +59,7 @@ class Recipe(models.Model):
         ordering = ('-pub_date', )
 
 
-class Ingredient_Recipe(models.Model):
+class IngredientRecipe(models.Model):
     recipe = models.ForeignKey(
         Recipe, on_delete=models.CASCADE, blank=True, null=True)
     ingredient = models.ForeignKey(

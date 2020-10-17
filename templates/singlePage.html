@@ -68,7 +68,7 @@
     </ul>
     <div class="single-card__section"><h3 class="single-card__section-title">Ингридиенты:</h3>
       <div class="single-card__items single-card__items_column">
-        {% for ingredients in recipe.ingredient_recipe_set.all %}
+        {% for ingredients in recipe.ingredientrecipe_set.all %}
           <p class=" single-card__section-item">{{ ingredients.ingredient.name }} - {{ ingredients.amount }} {{ ingredients.ingredient.dimension }}</p>
         {% endfor %}
       </div>

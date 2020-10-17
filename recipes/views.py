@@ -8,7 +8,7 @@ from django.http import HttpResponse, JsonResponse, request
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import RecipeCreateForm
-from .models import (Favorite, Follow, Ingredient, Ingredient_Recipe, Recipe, ShopList, Tag, User)
+from .models import (Favorite, Follow, Ingredient, IngredientRecipe, Recipe, ShopList, Tag, User)
 from .utils import get_ingredients
 
 def index(request):
@@ -65,9 +65,9 @@ def new_recipe(request):
             recipe = form.save(commit=False)
             recipe.author = request.user
             recipe.save()
-            objs = [Ingredient_Recipe(amount=amount, ingredient=Ingredient.objects.get(
+            objs = [IngredientRecipe(amount=amount, ingredient=Ingredient.objects.get(
                 name=name), recipe=recipe) for name, amount in ingredients.items()]
-            Ingredient_Recipe.objects.bulk_create(objs)
+            IngredientRecipe.objects.bulk_create(objs)
             form.save_m2m()
             return redirect("recipe_id", recipe_id=recipe.id)
     else:
@@ -92,10 +92,10 @@ def recipe_edit(request, recipe_id):
             form.add_error(None, "Добавьте хотя бы один ингредиент")
         if form.is_valid():
             form.save()
-            recipe.ingredient_recipe_set.all().delete()
-            objs = [Ingredient_Recipe(amount=amount, ingredient=Ingredient.objects.get(
+            recipe.ingredientrecipe_set.all().delete()
+            objs = [IngredientRecipe(amount=amount, ingredient=Ingredient.objects.get(
                 name=name), recipe=recipe) for name, amount in ingredients.items()]
-            Ingredient_Recipe.objects.bulk_create(objs)
+            IngredientRecipe.objects.bulk_create(objs)
             return redirect("recipe_id", recipe_id=recipe_id)
     else:
         form = RecipeCreateForm(instance=recipe)
@@ -244,7 +244,7 @@ def purchases_delete(request, recipe_id):
 def download_shop_list(request):
     shop_list = get_object_or_404(ShopList, user=request.user)
     recipes = shop_list.recipes.all()
-    ingredients = Ingredient_Recipe.objects.filter(recipe__in=recipes).select_related("ingredient").values(
+    ingredients = IngredientRecipe.objects.filter(recipe__in=recipes).select_related("ingredient").values(
         "ingredient__name", "ingredient__dimension").annotate(amounts=Sum("amount")).all()
 
     response = HttpResponse(content_type="text/txt")

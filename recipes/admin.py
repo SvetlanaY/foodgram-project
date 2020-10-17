@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.db import models
 
-from .models import (Favorite, Follow, Ingredient, Ingredient_Recipe, Recipe, Tag, User)
+from .models import (Favorite, Follow, Ingredient, IngredientRecipe, Recipe, Tag, User)
 
 
 class IngredientAdmin(admin.ModelAdmin):
@@ -29,7 +29,7 @@ class TagAdmin(admin.ModelAdmin):
     empty_value_display = "-пусто-"   # noqa
 
 
-class Ingredient_RecipeAdmin(admin.ModelAdmin):
+class IngredientRecipeAdmin(admin.ModelAdmin):
     list_display = ("ingredient", "recipe", "amount")
     list_filter = ("recipe", "ingredient")
     empty_value_display = "-пусто-"  # noqa
@@ -44,5 +44,5 @@ class FollowAdmin(admin.ModelAdmin):
 admin.site.register(Ingredient, IngredientAdmin)
 admin.site.register(Recipe, RecipeAdmin)
 admin.site.register(Tag, TagAdmin)
-admin.site.register(Ingredient_Recipe, Ingredient_RecipeAdmin)
+admin.site.register(IngredientRecipe, IngredientRecipeAdmin)
 admin.site.register(Follow, FollowAdmin)
