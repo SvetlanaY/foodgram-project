@@ -56,21 +56,20 @@ def ingredient_add(request):
 
 @login_required
 def new_recipe(request):
-    if request.method == "POST":
-        form = RecipeCreateForm(request.POST, files=request.FILES or None)
-        ingredients = get_ingredients(request)
+    form = RecipeCreateForm(request.POST or None,files=request.FILES or None)
+    ingredients = get_ingredients(request)
+    if form.is_valid():
         if not ingredients:
             form.add_error(None, "Добавьте хотя бы один ингредиент")
-        elif form.is_valid():
-            recipe = form.save(commit=False)
-            recipe.author = request.user
+        else:
+            recipe = form.save(commit=False) 
+            recipe.author = request.user 
             recipe.save()
             objs = [IngredientRecipe(amount=amount, ingredient=get_object_or_404(Ingredient, name=name), recipe=recipe) for name, amount in ingredients.items()]
             IngredientRecipe.objects.bulk_create(objs)
             form.save_m2m()
             return redirect("recipe_id", recipe_id=recipe.id)
-    else:
-        form = RecipeCreateForm(files=request.FILES or None)
+
     shops = ShopList.objects.get_or_create(user=request.user)[0].recipes.all()
 
     return render(request, "formRecipe.html", {"form": form, "shops": shops})
@@ -80,24 +79,21 @@ def new_recipe(request):
 def recipe_edit(request, recipe_id):
     edit = True
     recipe = get_object_or_404(
-        Recipe.objects.prefetch_related("tag"), id=recipe_id)
+        Recipe.objects.prefetch_related("tag"), id=recipe_id)        
     if request.user != recipe.author:
         return redirect("recipe_id", recipe_id=recipe_id)
-    if request.method == "POST":
-        form = RecipeCreateForm(
-            request.POST, files=request.FILES or None, instance=recipe)
-        ingredients = get_ingredients(request)
+    form = RecipeCreateForm(request.POST or None, files=request.FILES or None, instance=recipe)    
+    ingredients = get_ingredients(request)
+    if form.is_valid():
         if not ingredients:
             form.add_error(None, "Добавьте хотя бы один ингредиент")
-        if form.is_valid():
+        else:
             form.save()
             recipe.ingredientrecipe_set.all().delete()
             objs = [IngredientRecipe(amount=amount, ingredient=get_object_or_404(Ingredient, name=name), recipe=recipe) for name, amount in ingredients.items()]
             IngredientRecipe.objects.bulk_create(objs)
             return redirect("recipe_id", recipe_id=recipe_id)
-    else:
-        form = RecipeCreateForm(instance=recipe)
-
+    
     return render(request, "formRecipe.html", {"form": form,  "edit": edit})
 
 
