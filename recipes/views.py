@@ -65,8 +65,7 @@ def new_recipe(request):
             recipe = form.save(commit=False)
             recipe.author = request.user
             recipe.save()
-            objs = [IngredientRecipe(amount=amount, ingredient=Ingredient.objects.get(
-                name=name), recipe=recipe) for name, amount in ingredients.items()]
+            objs = [IngredientRecipe(amount=amount, ingredient=get_object_or_404(Ingredient, name=name), recipe=recipe) for name, amount in ingredients.items()]
             IngredientRecipe.objects.bulk_create(objs)
             form.save_m2m()
             return redirect("recipe_id", recipe_id=recipe.id)
@@ -93,8 +92,7 @@ def recipe_edit(request, recipe_id):
         if form.is_valid():
             form.save()
             recipe.ingredientrecipe_set.all().delete()
-            objs = [IngredientRecipe(amount=amount, ingredient=Ingredient.objects.get(
-                name=name), recipe=recipe) for name, amount in ingredients.items()]
+            objs = [IngredientRecipe(amount=amount, ingredient=get_object_or_404(Ingredient, name=name), recipe=recipe) for name, amount in ingredients.items()]
             IngredientRecipe.objects.bulk_create(objs)
             return redirect("recipe_id", recipe_id=recipe_id)
     else:
@@ -113,7 +111,7 @@ def recipe_delete(request, recipe_id):
 
 
 def recipe_view_id(request, recipe_id):
-    recipe = Recipe.objects.get(id=recipe_id)
+    recipe = get_object_or_404(Recipe, id=recipe_id)
     if request.user.is_authenticated:
         favorites = Favorite.objects.get_or_create(user=request.user)[0].recipes.all()
         subscriptions = Follow.objects.get_or_create(user=request.user)[0].author.all()
@@ -176,15 +174,14 @@ def favorite_index(request):
     tags = Tag.objects.all()
     if "filters" in request.GET:
         filters = request.GET.getlist("filters")
-        recipes = Favorite.objects.get(user=request.user).recipes.filter(
+        recipes = get_object_or_404(Favorite, user=request.user).recipes.filter(
             tag__slug__in=filters).order_by("-pub_date").distinct()
         tags_for_page = ""
         for filter in filters:
             tags_for_page += "filters="+filter+"&"
         tags_for_page_filter = tags_for_page[:-1]
     else:
-        recipes = Favorite.objects.get(
-            user=request.user).recipes.order_by("-pub_date")
+        recipes = get_object_or_404(Favorite, user=request.user).recipes.order_by("-pub_date")
 
     shops = ShopList.objects.get_or_create(user=request.user)[0].recipes.all()
 
@@ -222,7 +219,7 @@ def favorites_delete(request, id):
 
 @login_required
 def shops(request):
-    shops = ShopList.objects.get(user=request.user).recipes.order_by("-pub_date")
+    shops = get_object_or_404(ShopList, user=request.user).recipes.order_by("-pub_date")
     return render(request, "shopList.html", {"shops": shops})
 
 
