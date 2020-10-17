@@ -22,7 +22,7 @@
 </div>
 <div class="card__footer">       
   {% if user.is_authenticated %}
-    {% if recipe not in shop_list %}
+    {% if recipe not in shops %}
       <button class="button button_style_light-blue" name="purchases" data-out>
       <span class="icon-plus button__icon"></span>Добавить в покупки</button>
     {% else %}

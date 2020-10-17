@@ -38,9 +38,9 @@ def index(request):
 
     if request.user.is_authenticated:
         favorites = Favorite.objects.get_or_create(user=request.user)[0].recipes.all()
-        shop_list = ShopList.objects.get_or_create(user=request.user)[0].recipes.all()
+        shops = ShopList.objects.get_or_create(user=request.user)[0].recipes.all()
         context["favorites"] = favorites
-        context["shop_list"] = shop_list
+        context["shops"] = shops
 
         return render(request, "indexAuth.html", context)
     return render(request, "indexNotAuth.html", context)
@@ -72,9 +72,9 @@ def new_recipe(request):
             return redirect("recipe_id", recipe_id=recipe.id)
     else:
         form = RecipeCreateForm(files=request.FILES or None)
-    shop_list = ShopList.objects.get_or_create(user=request.user)[0].recipes.all()
+    shops = ShopList.objects.get_or_create(user=request.user)[0].recipes.all()
 
-    return render(request, "formRecipe.html", {"form": form, "shop_list": shop_list})
+    return render(request, "formRecipe.html", {"form": form, "shops": shops})
 
 
 @login_required
@@ -117,9 +117,9 @@ def recipe_view_id(request, recipe_id):
     if request.user.is_authenticated:
         favorites = Favorite.objects.get_or_create(user=request.user)[0].recipes.all()
         subscriptions = Follow.objects.get_or_create(user=request.user)[0].author.all()
-        shop_list = ShopList.objects.get_or_create(user=request.user)[0].recipes.all()
+        shops = ShopList.objects.get_or_create(user=request.user)[0].recipes.all()
 
-        return render(request, "singlePage.html", {"recipe": recipe, "favorites": favorites, "subscriptions": subscriptions, "shop_list": shop_list})
+        return render(request, "singlePage.html", {"recipe": recipe, "favorites": favorites, "subscriptions": subscriptions, "shops": shops})
     return render(request, "singlePageNotAuth.html", {"recipe": recipe})
 
 
@@ -127,7 +127,7 @@ def recipe_view_id(request, recipe_id):
 def follow_index(request):
     authors = Follow.objects.get_or_create(user=request.user)[0].author.prefetch_related("recipes")
     recipes = Recipe.objects.filter(author__in=authors).all().order_by("-pub_date")
-    shop_list = ShopList.objects.get_or_create(user=request.user)[0].recipes.all()
+    shops = ShopList.objects.get_or_create(user=request.user)[0].recipes.all()
     count_recipes = {}
     for author in authors:
         count_recipes[author.username] = Recipe.objects.filter(author=author).count()-3
@@ -144,7 +144,7 @@ def follow_index(request):
         "recipes": recipes,
         "authors": authors,
         "count_recipes": count_recipes,
-        "shop_list": shop_list,
+        "shops": shops,
         "recipes_for_print": recipes_for_print
     }
 
@@ -186,7 +186,7 @@ def favorite_index(request):
         recipes = Favorite.objects.get(
             user=request.user).recipes.order_by("-pub_date")
 
-    shop_list = ShopList.objects.get_or_create(user=request.user)[0].recipes.all()
+    shops = ShopList.objects.get_or_create(user=request.user)[0].recipes.all()
 
     paginator = Paginator(recipes, 6)
     page_number = request.GET.get("page")
@@ -197,7 +197,7 @@ def favorite_index(request):
         "paginator": paginator,
         'tags': tags,
         'filters': tags_for_page_filter,
-        "shop_list": shop_list,
+        "shops": shops,
     }
 
     return render(request, "favorite.html", context)
@@ -221,34 +221,34 @@ def favorites_delete(request, id):
 
 
 @login_required
-def shop_list(request):
-    shop_list = ShopList.objects.get(user=request.user).recipes.order_by("-pub_date")
-    return render(request, "shopList.html", {"shop_list": shop_list})
+def shops(request):
+    shops = ShopList.objects.get(user=request.user).recipes.order_by("-pub_date")
+    return render(request, "shopList.html", {"shops": shops})
 
 
 def purchases_add(request):
     recipe_id = json.loads(request.body).get("id")
     recipe = get_object_or_404(Recipe, id=recipe_id)
-    shop_list = ShopList.objects.get_or_create(user=request.user)
-    shop_list[0].recipes.add(recipe)
+    shops = ShopList.objects.get_or_create(user=request.user)
+    shops[0].recipes.add(recipe)
     return JsonResponse({"success": True})
 
 
 def purchases_delete(request, recipe_id):
     recipe = get_object_or_404(Recipe, pk=recipe_id)
-    shop_list = get_object_or_404(ShopList, user=request.user)
-    shop_list.recipes.remove(recipe)
+    shops = get_object_or_404(ShopList, user=request.user)
+    shops.recipes.remove(recipe)
     return JsonResponse({"success": True})
 
 
-def download_shop_list(request):
-    shop_list = get_object_or_404(ShopList, user=request.user)
-    recipes = shop_list.recipes.all()
+def download_shops(request):
+    shops = get_object_or_404(ShopList, user=request.user)
+    recipes = shops.recipes.all()
     ingredients = IngredientRecipe.objects.filter(recipe__in=recipes).select_related("ingredient").values(
         "ingredient__name", "ingredient__dimension").annotate(amounts=Sum("amount")).all()
 
     response = HttpResponse(content_type="text/txt")
-    response["Content-Disposition"] = 'attachment; filename="shop-list.txt"'
+    response["Content-Disposition"] = 'attachment; filename="shops.txt"'
 
     writer = csv.writer(response)
 

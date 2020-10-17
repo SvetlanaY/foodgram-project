@@ -26,20 +26,20 @@ class SignUp(CreateView):
 
 def profile(request, username):
     profile = get_object_or_404(User, username=username)
-    recipes = Recipe.objects.filter(author=profile).order_by("-pub_date").all()
+    
     tags_for_page_filter = ''
     tags = Tag.objects.all()
     if "filters" in request.GET:
         filters = request.GET.getlist("filters")
-        recipes_list = Recipe.objects.filter(tag__slug__in=filters, author=profile).order_by("-pub_date").distinct()
+        recipes = Recipe.objects.filter(tag__slug__in=filters, author=profile).order_by("-pub_date").distinct()
         tags_for_page = ''
         for filter in filters:
             tags_for_page += "filters="+filter+"&"
         tags_for_page_filter = tags_for_page[:-1]
     else:
-        recipes_list = recipes
+        recipes = Recipe.objects.filter(author=profile).order_by("-pub_date").all()
 
-    paginator = Paginator(recipes_list, 6)
+    paginator = Paginator(recipes, 6)
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
 
@@ -54,9 +54,9 @@ def profile(request, username):
     if request.user.is_authenticated:
         favorites = Favorite.objects.get_or_create(user=request.user)[0].recipes.all()
         subscriptions = Follow.objects.get_or_create(user=request.user)[0].author.all()
-        shop_list = ShopList.objects.get_or_create(user=request.user)[0].recipes.all()
+        shops = ShopList.objects.get_or_create(user=request.user)[0].recipes.all()
         context["favorites"] = favorites
         context["subscriptions"] = subscriptions
-        context["shop_list"] = shop_list
+        context["shops"] = shops
 
     return render(request, "authorRecipe.html", context)
