@@ -1,7 +1,7 @@
 {% load format_recipes %}
   <div class="card-user" data-author="{{ author.id }}">
     <div class="card-user__header">
-      <h2 class="card-user__title">{{author.username}}</h2>
+      <h2 class="card-user__title">{{ author.username }}</h2>
     </div>
     <div class="card-user__body">
       <ul class="card-user__items">        
@@ -10,9 +10,9 @@
             {% if recipe.author == author %}
               <li class="card-user__item">
                 <div class="recipe">
-                  <img src="{{ recipe.image.url }}" alt="{{recipe.name}}" class="recipe__image">                   
-                  <h3 class="recipe__title">{{recipe.name}}</h3>
-                  <p class="recipe__text"><span class="icon-time"></span> {{recipe.time}} мин.</p>
+                  <img src="{{ recipe.image.url }}" alt="{{ recipe.name }}" class="recipe__image">                   
+                  <h3 class="recipe__title">{{ recipe.name }}</h3>
+                  <p class="recipe__text"><span class="icon-time"></span> {{ recipe.time }} мин.</p>
                 </div>
               </li>
             {% endif %}

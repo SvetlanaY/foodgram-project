@@ -34,7 +34,7 @@
           {{ form.name|addclass:"form__input" }} 
           {% if form.errors %}                        
             {% for error in form.name.errors %}             
-              <span class="form__error">{{error|escape }}</span>
+              <span class="form__error">{{ error|escape }}</span>
             {% endfor %}
           {% endif %}
         </div>
@@ -47,10 +47,10 @@
               <div class="tags__item">
                 <input type="checkbox"
                   name="tag"
-                  value= "{{tag_model.pk }}"
-                  id="id_{{tag_model.value }}"
+                  value= "{{ tag_model.pk }}"
+                  id="id_{{ tag_model.value }}"
                   class="tags__checkbox tags__checkbox_style_{{ tag_model.style }}">
-                  <label for="id_{{ tag_model.value }}" class="tags__label">{{ tag_model.name}}</label>
+                  <label for="id_{{ tag_model.value }}" class="tags__label">{{ tag_model.name }}</label>
                </div>
             {% endfor %}
           </div>
@@ -119,7 +119,7 @@
     {{ form.image }}
     {% if form.errors %}
       {% for error in form.image.errors %}
-        <span class="form__error">{{ error|escape}}</span>
+        <span class="form__error">{{ error|escape }}</span>
       {% endfor %}
     {% endif %}
   </div>

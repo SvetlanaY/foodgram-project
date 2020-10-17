@@ -9,23 +9,23 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import RecipeCreateForm
 from .models import (Favorite, Follow, Ingredient, Ingredient_Recipe, Recipe, ShopList, Tag, User)
-
+from .utils import get_ingredients
 
 def index(request):
     tags_for_page_filter = ''
     tags = Tag.objects.all()
     if "filters" in request.GET:
         filters = request.GET.getlist("filters")
-        recipes_list = Recipe.objects.filter(
+        recipes = Recipe.objects.filter(
             tag__slug__in=filters).order_by("-pub_date").distinct()
         tags_for_page = ''
         for filter in filters:
             tags_for_page += "filters="+filter+"&"
         tags_for_page_filter = tags_for_page[:-1]
     else:
-        recipes_list = Recipe.objects.all().order_by("-pub_date")
+        recipes = Recipe.objects.all().order_by("-pub_date")
 
-    paginator = Paginator(recipes_list, 6)
+    paginator = Paginator(recipes, 6)
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
 
@@ -49,18 +49,9 @@ def index(request):
 @login_required
 def ingredient_add(request):
     query = request.GET["query"]
-    ingredients_list = Ingredient.objects.filter(name__istartswith=query).extra(
-        select={"title": "name"}).values("title", "dimension").order_by()
-    return JsonResponse(list(ingredients_list), safe=False)
-
-
-def get_ingredients(request):
-    ingredients = {}
-    for key in request.POST:
-        if key.startswith("nameIngredient"):
-            value_ingredient = key[15:]
-            ingredients[request.POST[key]] = request.POST["valueIngredient_" + value_ingredient]
-    return ingredients
+    ingredients = Ingredient.objects.filter(name__istartswith=query).extra(
+        select={"title": "name"}).values("title", "dimension")
+    return JsonResponse(list(ingredients), safe=False)
 
 
 @login_required
@@ -68,7 +59,7 @@ def new_recipe(request):
     if request.method == "POST":
         form = RecipeCreateForm(request.POST, files=request.FILES or None)
         ingredients = get_ingredients(request)
-        if not bool(ingredients):
+        if not ingredients:
             form.add_error(None, "Добавьте хотя бы один ингредиент")
         elif form.is_valid():
             recipe = form.save(commit=False)
@@ -97,7 +88,7 @@ def recipe_edit(request, recipe_id):
         form = RecipeCreateForm(
             request.POST, files=request.FILES or None, instance=recipe)
         ingredients = get_ingredients(request)
-        if bool(ingredients) is False:
+        if not ingredients:
             form.add_error(None, "Добавьте хотя бы один ингредиент")
         if form.is_valid():
             form.save()
@@ -185,19 +176,19 @@ def favorite_index(request):
     tags = Tag.objects.all()
     if "filters" in request.GET:
         filters = request.GET.getlist("filters")
-        recipes_list = Favorite.objects.get(user=request.user).recipes.filter(
+        recipes = Favorite.objects.get(user=request.user).recipes.filter(
             tag__slug__in=filters).order_by("-pub_date").distinct()
         tags_for_page = ""
         for filter in filters:
             tags_for_page += "filters="+filter+"&"
         tags_for_page_filter = tags_for_page[:-1]
     else:
-        recipes_list = Favorite.objects.get(
+        recipes = Favorite.objects.get(
             user=request.user).recipes.order_by("-pub_date")
 
     shop_list = ShopList.objects.get_or_create(user=request.user)[0].recipes.all()
 
-    paginator = Paginator(recipes_list, 6)
+    paginator = Paginator(recipes, 6)
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
 
