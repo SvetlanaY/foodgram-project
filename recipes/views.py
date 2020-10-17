@@ -3,13 +3,15 @@ import json
 
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db.models import Count, Sum
-from django.http import HttpResponse, JsonResponse, request
+from django.db.models import Sum
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import RecipeCreateForm
-from .models import (Favorite, Follow, Ingredient, IngredientRecipe, Recipe, ShopList, Tag, User)
+from .models import (Favorite, Follow, Ingredient, IngredientRecipe, Recipe,
+                     ShopList, Tag, User)
 from .utils import get_ingredients
+
 
 def index(request):
     tags_for_page_filter = ''
@@ -37,8 +39,10 @@ def index(request):
     }
 
     if request.user.is_authenticated:
-        favorites = Favorite.objects.get_or_create(user=request.user)[0].recipes.all()
-        shops = ShopList.objects.get_or_create(user=request.user)[0].recipes.all()
+        favorites = Favorite.objects.get_or_create(user=request.user)[
+            0].recipes.all()
+        shops = ShopList.objects.get_or_create(
+            user=request.user)[0].recipes.all()
         context["favorites"] = favorites
         context["shops"] = shops
 
@@ -56,16 +60,17 @@ def ingredient_add(request):
 
 @login_required
 def new_recipe(request):
-    form = RecipeCreateForm(request.POST or None,files=request.FILES or None)
+    form = RecipeCreateForm(request.POST or None, files=request.FILES or None)
     ingredients = get_ingredients(request)
     if form.is_valid():
         if not ingredients:
             form.add_error(None, "Добавьте хотя бы один ингредиент")
         else:
-            recipe = form.save(commit=False) 
-            recipe.author = request.user 
+            recipe = form.save(commit=False)
+            recipe.author = request.user
             recipe.save()
-            objs = [IngredientRecipe(amount=amount, ingredient=get_object_or_404(Ingredient, name=name), recipe=recipe) for name, amount in ingredients.items()]
+            objs = [IngredientRecipe(amount=amount, ingredient=get_object_or_404(
+                Ingredient, name=name), recipe=recipe) for name, amount in ingredients.items()]
             IngredientRecipe.objects.bulk_create(objs)
             form.save_m2m()
             return redirect("recipe_id", recipe_id=recipe.id)
@@ -79,10 +84,11 @@ def new_recipe(request):
 def recipe_edit(request, recipe_id):
     edit = True
     recipe = get_object_or_404(
-        Recipe.objects.prefetch_related("tag"), id=recipe_id)        
+        Recipe.objects.prefetch_related("tag"), id=recipe_id)
     if request.user != recipe.author:
         return redirect("recipe_id", recipe_id=recipe_id)
-    form = RecipeCreateForm(request.POST or None, files=request.FILES or None, instance=recipe)    
+    form = RecipeCreateForm(request.POST or None,
+                            files=request.FILES or None, instance=recipe)
     ingredients = get_ingredients(request)
     if form.is_valid():
         if not ingredients:
@@ -90,10 +96,11 @@ def recipe_edit(request, recipe_id):
         else:
             form.save()
             recipe.ingredientrecipe_set.all().delete()
-            objs = [IngredientRecipe(amount=amount, ingredient=get_object_or_404(Ingredient, name=name), recipe=recipe) for name, amount in ingredients.items()]
+            objs = [IngredientRecipe(amount=amount, ingredient=get_object_or_404(
+                Ingredient, name=name), recipe=recipe) for name, amount in ingredients.items()]
             IngredientRecipe.objects.bulk_create(objs)
             return redirect("recipe_id", recipe_id=recipe_id)
-    
+
     return render(request, "formRecipe.html", {"form": form,  "edit": edit})
 
 
@@ -109,9 +116,12 @@ def recipe_delete(request, recipe_id):
 def recipe_view_id(request, recipe_id):
     recipe = get_object_or_404(Recipe, id=recipe_id)
     if request.user.is_authenticated:
-        favorites = Favorite.objects.get_or_create(user=request.user)[0].recipes.all()
-        subscriptions = Follow.objects.get_or_create(user=request.user)[0].author.all()
-        shops = ShopList.objects.get_or_create(user=request.user)[0].recipes.all()
+        favorites = Favorite.objects.get_or_create(user=request.user)[
+            0].recipes.all()
+        subscriptions = Follow.objects.get_or_create(user=request.user)[
+            0].author.all()
+        shops = ShopList.objects.get_or_create(
+            user=request.user)[0].recipes.all()
 
         return render(request, "singlePage.html", {"recipe": recipe, "favorites": favorites, "subscriptions": subscriptions, "shops": shops})
     return render(request, "singlePageNotAuth.html", {"recipe": recipe})
@@ -119,15 +129,19 @@ def recipe_view_id(request, recipe_id):
 
 @login_required
 def follow_index(request):
-    authors = Follow.objects.get_or_create(user=request.user)[0].author.prefetch_related("recipes")
-    recipes = Recipe.objects.filter(author__in=authors).all().order_by("-pub_date")
+    authors = Follow.objects.get_or_create(user=request.user)[
+        0].author.prefetch_related("recipes")
+    recipes = Recipe.objects.filter(
+        author__in=authors).all().order_by("-pub_date")
     shops = ShopList.objects.get_or_create(user=request.user)[0].recipes.all()
     count_recipes = {}
     for author in authors:
-        count_recipes[author.username] = Recipe.objects.filter(author=author).count()-3
+        count_recipes[author.username] = Recipe.objects.filter(
+            author=author).count()-3
     recipes_for_print = []
     for author in authors:
-        recipes_for_print.append(Recipe.objects.filter(author=author).order_by("-pub_date")[:3])
+        recipes_for_print.append(Recipe.objects.filter(
+            author=author).order_by("-pub_date")[:3])
     paginator = Paginator(authors, 6)
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
@@ -177,7 +191,8 @@ def favorite_index(request):
             tags_for_page += "filters="+filter+"&"
         tags_for_page_filter = tags_for_page[:-1]
     else:
-        recipes = get_object_or_404(Favorite, user=request.user).recipes.order_by("-pub_date")
+        recipes = get_object_or_404(
+            Favorite, user=request.user).recipes.order_by("-pub_date")
 
     shops = ShopList.objects.get_or_create(user=request.user)[0].recipes.all()
 
@@ -215,7 +230,8 @@ def favorites_delete(request, id):
 
 @login_required
 def shops(request):
-    shops = get_object_or_404(ShopList, user=request.user).recipes.order_by("-pub_date")
+    shops = get_object_or_404(
+        ShopList, user=request.user).recipes.order_by("-pub_date")
     return render(request, "shopList.html", {"shops": shops})
 
 
