@@ -16,7 +16,8 @@ class Tag(models.Model):
 class Ingredient(models.Model):
     name = models.CharField(max_length=100, verbose_name='Название')
     dimension = models.CharField(
-        max_length=100, blank=True, null=True, verbose_name='Единицы измерения')
+        max_length=100, blank=True, null=True,
+        verbose_name='Единицы измерения')
 
     class Meta:
         verbose_name = 'Ингредиент'
@@ -29,7 +30,8 @@ class Ingredient(models.Model):
 
 class Recipe(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE,
-                               related_name='recipes', verbose_name='Автор публикации',)
+                               related_name='recipes',
+                               verbose_name='Автор публикации',)
     name = models.CharField(verbose_name='Название рецепта', max_length=200)
     image = models.ImageField(upload_to='recipes/',)
     description = models.CharField(max_length=280)
@@ -75,7 +77,8 @@ class Follow(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='follower')
     author = models.ManyToManyField(
-        User, related_name='following', verbose_name='Избранный автор', blank=True)
+        User, related_name='following',
+        verbose_name='Избранный автор', blank=True)
 
     def __str__(self):
         return f'Подписки {self.user}'
@@ -101,7 +104,8 @@ class Favorite(models.Model):
 
 class ShopList(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE,
-                             related_name='shop_lists', verbose_name='Пользователь')
+                             related_name='shop_lists',
+                             verbose_name='Пользователь')
     recipes = models.ManyToManyField(
         Recipe, related_name='shop_lists', verbose_name='Рецепты', blank=True)
 

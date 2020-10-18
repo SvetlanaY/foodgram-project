@@ -30,7 +30,8 @@ def profile(request, username):
     if "filters" in request.GET:
         filters = request.GET.getlist("filters")
         recipes = Recipe.objects.filter(
-            tag__slug__in=filters, author=profile).order_by("-pub_date").distinct()
+            tag__slug__in=filters, author=profile).order_by(
+            "-pub_date").distinct()
         tags_for_page = ''
         for filter in filters:
             tags_for_page += "filters="+filter+"&"

@@ -69,8 +69,11 @@ def new_recipe(request):
             recipe = form.save(commit=False)
             recipe.author = request.user
             recipe.save()
-            objs = [IngredientRecipe(amount=amount, ingredient=get_object_or_404(
-                Ingredient, name=name), recipe=recipe) for name, amount in ingredients.items()]
+            objs = [IngredientRecipe(
+                amount=amount,
+                ingredient=get_object_or_404(Ingredient, name=name),
+                recipe=recipe)
+                for name, amount in ingredients.items()]
             IngredientRecipe.objects.bulk_create(objs)
             form.save_m2m()
             return redirect("recipe_id", recipe_id=recipe.id)
@@ -96,8 +99,11 @@ def recipe_edit(request, recipe_id):
         else:
             form.save()
             recipe.ingredientrecipe_set.all().delete()
-            objs = [IngredientRecipe(amount=amount, ingredient=get_object_or_404(
-                Ingredient, name=name), recipe=recipe) for name, amount in ingredients.items()]
+            objs = [IngredientRecipe(
+                amount=amount,
+                ingredient=get_object_or_404(Ingredient, name=name),
+                recipe=recipe)
+                for name, amount in ingredients.items()]
             IngredientRecipe.objects.bulk_create(objs)
             return redirect("recipe_id", recipe_id=recipe_id)
 
@@ -122,8 +128,13 @@ def recipe_view_id(request, recipe_id):
             0].author.all()
         shops = ShopList.objects.get_or_create(
             user=request.user)[0].recipes.all()
-
-        return render(request, "singlePage.html", {"recipe": recipe, "favorites": favorites, "subscriptions": subscriptions, "shops": shops})
+        context = {
+            "recipe": recipe,
+            "favorites": favorites,
+            "subscriptions": subscriptions,
+            "shops": shops
+        }
+        return render(request, "singlePage.html", context)
     return render(request, "singlePageNotAuth.html", {"recipe": recipe})
 
 
@@ -132,7 +143,7 @@ def follow_index(request):
     authors = Follow.objects.get_or_create(user=request.user)[
         0].author.prefetch_related("recipes")
     recipes = Recipe.objects.filter(
-        author__in=authors).all().order_by("-pub_date")
+        author__in=authors).order_by("-pub_date")
     shops = ShopList.objects.get_or_create(user=request.user)[0].recipes.all()
     count_recipes = {}
     for author in authors:
@@ -184,7 +195,8 @@ def favorite_index(request):
     tags = Tag.objects.all()
     if "filters" in request.GET:
         filters = request.GET.getlist("filters")
-        recipes = get_object_or_404(Favorite, user=request.user).recipes.filter(
+        recipes = get_object_or_404(
+            Favorite, user=request.user).recipes.filter(
             tag__slug__in=filters).order_by("-pub_date").distinct()
         tags_for_page = ""
         for filter in filters:
@@ -253,8 +265,10 @@ def purchases_delete(request, recipe_id):
 def download_shops(request):
     shops = get_object_or_404(ShopList, user=request.user)
     recipes = shops.recipes.all()
-    ingredients = IngredientRecipe.objects.filter(recipe__in=recipes).select_related("ingredient").values(
-        "ingredient__name", "ingredient__dimension").annotate(amounts=Sum("amount")).all()
+    ingredients = IngredientRecipe.objects.filter(
+        recipe__in=recipes).select_related("ingredient").values(
+        "ingredient__name", "ingredient__dimension").annotate(
+        amounts=Sum("amount")).all()
 
     response = HttpResponse(content_type="text/txt")
     response["Content-Disposition"] = 'attachment; filename="shops.txt"'
