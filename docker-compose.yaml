@@ -16,7 +16,7 @@ services:
       - ./.env
   web:
    # build: .
-    image: svetlana1905/foodgram:v3.10.2020
+    image: svetlana1905/foodgram:v4.10.2020
     restart: always
     command: gunicorn foodgram.wsgi:application --bind 0.0.0.0:8000    
     volumes:

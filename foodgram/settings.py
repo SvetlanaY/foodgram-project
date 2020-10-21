@@ -28,7 +28,7 @@ DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 
-DOMAIN_NAME = 'foodgram.ru'
+DOMAIN_NAME = 'foodgramm.cf'
 
 
 # Application definition
