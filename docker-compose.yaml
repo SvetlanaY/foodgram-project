@@ -1,0 +1,51 @@
+version: '3.8'
+
+volumes:
+  postgres_data:
+  static_volume: 
+  media_volume: 
+
+services:  
+  db:
+    image: postgres:latest
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    networks:
+      - database_network  
+    env_file:
+      - ./.env
+  web:
+   # build: .
+    image: svetlana1905/foodgram:v3.10.2020
+    restart: always
+    command: gunicorn foodgram.wsgi:application --bind 0.0.0.0:8000    
+    volumes:
+      - static_volume:/code/static
+      - media_volume:/code/media
+    networks: 
+      - nginx_network 
+      - database_network
+    depends_on:
+      - db
+    env_file:
+      - ./.env       
+    
+  nginx:
+    image: nginx:latest
+    restart: always  
+    volumes:
+      - ./config/nginx/conf.d:/etc/nginx/conf.d
+      - static_volume:/etc/nginx/templates/static
+      - media_volume:/etc/nginx/templates/media      
+    ports:
+      - "8000:80"  
+    depends_on:
+      - web    
+    networks:  
+      - nginx_network  
+
+networks:  
+  nginx_network:
+    driver: bridge  
+  database_network:
+    driver: bridge   
