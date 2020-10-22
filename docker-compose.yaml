@@ -15,7 +15,7 @@ services:
     env_file:
       - ./.env
   web:
-   # build: .
+   
     image: svetlana1905/foodgram:latest
     restart: always
     command: gunicorn foodgram.wsgi:application --bind 0.0.0.0:8000    
