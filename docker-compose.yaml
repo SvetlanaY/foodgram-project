@@ -8,6 +8,7 @@ volumes:
 services:  
   db:
     image: postgres:latest
+    #Всегда стоит явно указывать версию - выйдет новая, твой продакшн обновится и упадет изза несовместимости.
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     networks:
@@ -38,7 +39,7 @@ services:
       - static_volume:/etc/nginx/templates/static
       - media_volume:/etc/nginx/templates/media      
     ports:
-      - "8000:80"  
+      - "80:80"  
     depends_on:
       - web    
     networks:  
