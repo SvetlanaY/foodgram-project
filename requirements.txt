@@ -22,7 +22,7 @@ toml==0.10.1
 wrapt==1.12.1
 
 attrs==19.3.0
-certifi==2020.4.5.1
+certifi==2022.12.7
 chardet==3.0.4
 django-filter==2.2.0
 idna==2.9                 # via requests
